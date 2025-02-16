@@ -1,2 +1,1 @@
-site web entièrement fait en TypeScript
-Me servira comme portfolio
+site web entièrement fait en TypeScript, me servira comme portfolio
