@@ -155,7 +155,7 @@ class Portfolio {
         border-radius: 4px;
         padding: 10px;
         margin-top: 10px;
-        font-family: "Fira Code", Consolas, "Courier New", monospace;
+        font-family: "Gill Sans", monospace;
         font-size: 0.9em;
         overflow-x: auto;
       }
@@ -183,7 +183,7 @@ class Portfolio {
       }
       @media (max-width: 600px) {
         body {
-          font-family: "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+          font-family: Ubuntu, monospace;
           font-size: 15px;
         }
         .ide-container {
@@ -328,7 +328,7 @@ axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'
       `<<span class='keyword'>head</span>>
       <<span class='keyword'>title</span>><span class="string">old.0xZKnw.me</span><<span class='keyword'>/title</span>>
 <<span class="keyword">/head</span>>`,
-      'My old portfolio, built exclusively with HTML and CSS. <a href="https://old-0xzknw.netlify.app">Old Portfolio</a>'
+      'My old portfolio, built exclusively with HTML and CSS. Site : <a href="https://old-0xzknw.netlify.app">Old Portfolio</a>'
     );
 
     projectsContainer.append(card1, card2, card3, card4);
