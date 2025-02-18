@@ -14,21 +14,25 @@ class Portfolio {
   }
 
   private applyGlobalStyles(): void {
-    // Styles appliqués directement au body
+    if (!document.head.querySelector("meta[name='viewport']")) {
+      const meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1.0';
+      document.head.appendChild(meta);
+    }
+
     document.body.style.cssText = `
       margin: 0;
-      font-family: "Fira Code", Consolas, "Courier New", monospace;
+      font-family: Ubuntu, monospace;
       font-size: 16px;
       background: linear-gradient(135deg, #0d1117 0%, #010409 100%);
     `;
 
-    // Injection d'un bloc de styles globaux
     const style = document.createElement('style');
     style.textContent = `
       html {
         scroll-behavior: smooth;
       }
-      /* Masquer la scrollbar */
       ::-webkit-scrollbar {
         display: none;
       }
@@ -112,7 +116,7 @@ class Portfolio {
       .project-card {
         flex: 1 1 40%;
         background-color: #2d2d2d;
-        padding: 10px; /* padding réduit pour une hauteur moindre */
+        padding: 10px;
         border-radius: 4px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         cursor: pointer;
@@ -151,14 +155,14 @@ class Portfolio {
         border-radius: 4px;
         padding: 10px;
         margin-top: 10px;
-        font-family: "Fira Code", monospace;
+        font-family: "Fira Code", Consolas, "Courier New", monospace;
         font-size: 0.9em;
         overflow-x: auto;
       }
       .code-snippet .keyword { color: #F92672; }
       .code-snippet .string { color: #E6DB74; }
       .code-snippet .function { color: #A6E22E; }
-      .code-snippet .comment { color: #75715E; }
+      .code-snippet .comment { display: none; }
       .scroll-element {
         opacity: 0;
         transform: translateY(20px);
@@ -178,13 +182,25 @@ class Portfolio {
         animation: startupAnimation 1s ease-out forwards;
       }
       @media (max-width: 600px) {
+        body {
+          font-family: "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+          font-size: 15px;
+        }
         .ide-container {
           width: 95vw;
-          aspect-ratio: auto;
-          min-height: auto;
-          max-height: none;
           padding: 20px 30px;
           margin: 20px auto;
+          aspect-ratio: auto;
+          box-sizing: border-box;
+        }
+        header h1 {
+          font-size: 1.5em;
+        }
+        header h2 {
+          font-size: 1em;
+        }
+        section h3 {
+          font-size: 1.2em;
         }
         .project-card { flex: 1 1 100%; }
       }
@@ -205,7 +221,6 @@ class Portfolio {
     });
     this.container.appendChild(ideHeader);
 
-    // Effet de survol
     this.container.addEventListener('mouseenter', () => {
       this.container.style.transform = 'scale(1.02)';
     });
@@ -217,7 +232,7 @@ class Portfolio {
   private addHeader(): void {
     const header = document.createElement('header');
     header.classList.add('scroll-element');
-    
+
     const title = document.createElement('h1');
     title.textContent = '0xZKnw';
 
@@ -237,8 +252,7 @@ class Portfolio {
     heading.textContent = 'About me:';
 
     const paragraph = document.createElement('p');
-    paragraph.textContent =
-      "Computer science student, passionate about development and blockchains. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
+    paragraph.textContent = "Computer science student, passionate about development and blockchains. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
 
     aboutSection.append(heading, paragraph);
     this.container.appendChild(aboutSection);
@@ -280,39 +294,44 @@ class Portfolio {
 
       card.append(title, desc, codeSnippet, details);
       card.addEventListener('click', () => card.classList.toggle('expanded'));
+
       return card;
     };
 
-    // Projet Nexa
     const card1 = createCard(
       'Nexa',
       'Decentralized messaging service.',
-      `<span class='comment'>// Initializing Nexa</span>
-<span class='keyword'>const</span> messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>);`,
+      `<span class='keyword'>from</span> <span class='function'>Nexa</span> <span class='keyword'>import</span> <span class='function'>initService</span>
+</span>messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>)`,
       "Developed in Python with a team of four. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
     );
 
-    // Projet Test Blockchain in Python
     const card2 = createCard(
       'Test Blockchain in Python',
       'Creating a simple blockchain.',
-      `<span class='comment'># Initializing the blockchain</span>
-<span class='keyword'>def</span> <span class='function'>create_blockchain</span>():
+      `<span class='keyword'>def</span> <span class='function'>create_blockchain</span>():
     <span class='keyword'>return</span> [<span class='string'>'genesis block'</span>]`,
-      "Developed solo. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>"
+      "Developed solo in Python. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>"
     );
 
-    // Projet Template (nouveau projet)
     const card3 = createCard(
       '0xZKnw.me',
       'This Website',
-      `<span class='comment'>// Initializing 0xZKnw.me</span>
-<span class='keyword'>import</span> <span>axios</span>;
-<span>axios</span>.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
-      "Template project developed for demonstration purposes. GitHub: <a href='#'>TemplateRepo</a>"
+      `<span class='keyword'>import</span> axios;
+axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
+      "Developed solo in TypeScript. GitHub: <a href='https://github.com/0xZKnw/0xzknw.fr'>0xZKnw.me</a>"
     );
 
-    projectsContainer.append(card1, card2, card3);
+    const card4 = createCard(
+      'Old Portfolio',
+      'My old portfolio.',
+      `<<span class='keyword'>head</span>>
+      <<span class='keyword'>title</span>><span class="string">old.0xZKnw.me</span><<span class='keyword'>/title</span>>
+<<span class="keyword">/head</span>>`,
+      'My old portfolio, built exclusively with HTML and CSS. <a href="https://old-0xzknw.netlify.app">Old Portfolio</a>'
+    );
+
+    projectsContainer.append(card1, card2, card3, card4);
     projectsSection.append(heading, projectsContainer);
     this.container.appendChild(projectsSection);
   }
@@ -328,7 +347,10 @@ class Portfolio {
     const paragraph = document.createElement('p');
     paragraph.textContent = "Discord: 0xZKnw  |  GitHub: 0xZKnw  |  Twitter: 0xZKnw";
 
-    contactSection.append(heading, paragraph);
+    const attention = document.createElement('p');
+    attention.textContent = "This site is better viewed on a desktop.";
+
+    contactSection.append(heading, paragraph, attention);
     this.container.appendChild(contactSection);
   }
 
