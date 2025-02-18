@@ -14,27 +14,27 @@ class Portfolio {
   }
 
   private applyGlobalStyles(): void {
-    document.body.style.background =
-      'linear-gradient(135deg, #0d1117 0%, #010409 100%)';
-    document.body.style.margin = '0';
-    document.body.style.fontFamily = '"Fira Code", Consolas, "Courier New", monospace';
-    document.body.style.fontSize = '16px';
-    document.documentElement.style.scrollBehavior = 'smooth';
+    // Styles appliqués directement au body
+    document.body.style.cssText = `
+      margin: 0;
+      font-family: "Fira Code", Consolas, "Courier New", monospace;
+      font-size: 16px;
+      background: linear-gradient(135deg, #0d1117 0%, #010409 100%);
+    `;
 
+    // Injection d'un bloc de styles globaux
     const style = document.createElement('style');
     style.textContent = `
       html {
         scroll-behavior: smooth;
       }
-      body::-webkit-scrollbar {
+      /* Masquer la scrollbar */
+      ::-webkit-scrollbar {
         display: none;
       }
       body {
         -ms-overflow-style: none;
         scrollbar-width: none;
-      }
-      .ide-container::-webkit-scrollbar {
-        display: none;
       }
       .ide-container {
         background-color: #1e1e1e;
@@ -72,15 +72,9 @@ class Portfolio {
         border-radius: 50%;
         margin-right: 5px;
       }
-      .ide-header .close {
-        background-color: #FF5F56;
-      }
-      .ide-header .minimize {
-        background-color: #FFBD2E;
-      }
-      .ide-header .maximize {
-        background-color: #27C93F;
-      }
+      .ide-header .close { background-color: #FF5F56; }
+      .ide-header .minimize { background-color: #FFBD2E; }
+      .ide-header .maximize { background-color: #27C93F; }
       header {
         border-bottom: 1px solid #333;
         padding-bottom: 10px;
@@ -124,15 +118,8 @@ class Portfolio {
         transform: scale(1.03);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
       }
-      .project-card h4 {
-        color: #8abeb7;
-        margin: 0 0 10px 0;
-      }
-      .project-card p {
-        font-size: 0.95em;
-        color: #c5c8c6;
-        line-height: 1.4;
-      }
+      .project-card h4 { color: #8abeb7; margin-bottom: 10px; }
+      .project-card p { font-size: 0.95em; color: #c5c8c6; line-height: 1.4; }
       .project-details {
         max-height: 0;
         overflow: hidden;
@@ -150,11 +137,10 @@ class Portfolio {
         color: #81a2be;
         text-decoration: none;
       }
-      .project-details a:hover {
-        text-decoration: underline;
-      }
+      .project-details a:hover { text-decoration: underline; }
       .code-snippet {
-        background: #1e1e1e;
+        background: #272822;
+        color: #F8F8F2;
         border-radius: 4px;
         padding: 10px;
         margin-top: 10px;
@@ -162,10 +148,10 @@ class Portfolio {
         font-size: 0.9em;
         overflow-x: auto;
       }
-      .code-snippet .keyword { color: #569cd6; }
-      .code-snippet .string { color: #ce9178; }
-      .code-snippet .function { color: #dcdcaa; }
-      .code-snippet .comment { color: #6a9955; }
+      .code-snippet .keyword { color: #F92672; }
+      .code-snippet .string { color: #E6DB74; }
+      .code-snippet .function { color: #A6E22E; }
+      .code-snippet .comment { color: #75715E; }
       .scroll-element {
         opacity: 0;
         transform: translateY(20px);
@@ -174,24 +160,12 @@ class Portfolio {
         animation: fadeIn 0.8s ease forwards;
       }
       @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
       }
       @keyframes startupAnimation {
-        0% {
-          opacity: 0;
-          transform: scale(0.8) rotateX(10deg);
-        }
-        100% {
-          opacity: 1;
-          transform: scale(1) rotateX(0deg);
-        }
+        0% { opacity: 0; transform: scale(0.8) rotateX(10deg); }
+        100% { opacity: 1; transform: scale(1) rotateX(0deg); }
       }
       .startup {
         animation: startupAnimation 1s ease-out forwards;
@@ -205,9 +179,7 @@ class Portfolio {
           padding: 20px 30px;
           margin: 20px auto;
         }
-        .project-card {
-          flex: 1 1 100%;
-        }
+        .project-card { flex: 1 1 100%; }
       }
     `;
     document.head.appendChild(style);
@@ -226,6 +198,7 @@ class Portfolio {
     });
     this.container.appendChild(ideHeader);
 
+    // Effet de survol
     this.container.addEventListener('mouseenter', () => {
       this.container.style.transform = 'scale(1.02)';
     });
@@ -237,15 +210,14 @@ class Portfolio {
   private addHeader(): void {
     const header = document.createElement('header');
     header.classList.add('scroll-element');
-
+    
     const title = document.createElement('h1');
     title.textContent = '0xZKnw';
 
     const subtitle = document.createElement('h2');
-    subtitle.textContent = 'Developper | Blockchain Enthusiast';
+    subtitle.textContent = 'Developer | Blockchain Enthusiast';
 
-    header.appendChild(title);
-    header.appendChild(subtitle);
+    header.append(title, subtitle);
     this.container.appendChild(header);
   }
 
@@ -255,13 +227,13 @@ class Portfolio {
     aboutSection.style.textAlign = 'left';
 
     const heading = document.createElement('h3');
-    heading.textContent = 'About me :';
+    heading.textContent = 'About me:';
 
     const paragraph = document.createElement('p');
-    paragraph.textContent = "Computer science student, passionate about development and blockchains. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
+    paragraph.textContent =
+      "Computer science student, passionate about development and blockchains. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
 
-    aboutSection.appendChild(heading);
-    aboutSection.appendChild(paragraph);
+    aboutSection.append(heading, paragraph);
     this.container.appendChild(aboutSection);
   }
 
@@ -271,71 +243,64 @@ class Portfolio {
     projectsSection.style.textAlign = 'left';
 
     const heading = document.createElement('h3');
-    heading.textContent = 'My Projects :';
+    heading.textContent = 'My Projects:';
 
     const projectsContainer = document.createElement('div');
-    projectsContainer.style.display = 'flex';
-    projectsContainer.style.flexWrap = 'wrap';
-    projectsContainer.style.gap = '60px';
-    projectsContainer.style.justifyContent = 'space-around';
-    projectsContainer.style.marginTop = '10px';
+    projectsContainer.style.cssText = `
+      display: flex;
+      flex-wrap: wrap;
+      gap: 60px;
+      justify-content: space-around;
+      margin-top: 10px;
+    `;
 
-    const projectCard = document.createElement('div');
-    projectCard.classList.add('project-card');
+    const createCard = (
+      titleText: string,
+      descText: string,
+      codeHTML: string,
+      detailsHTML: string
+    ): HTMLDivElement => {
+      const card = document.createElement('div');
+      card.classList.add('project-card');
 
-    const projectTitle = document.createElement('h4');
-    projectTitle.textContent = 'Nexa';
+      const title = document.createElement('h4');
+      title.textContent = titleText;
 
-    const projectDesc = document.createElement('p');
-    projectDesc.textContent = "Decentralized messaging service.";
+      const desc = document.createElement('p');
+      desc.textContent = descText;
 
-    const projectDetails = document.createElement('div');
-    projectDetails.classList.add('project-details');
-    projectDetails.innerHTML = "Developed in Python with a team of four. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>";
+      const codeSnippet = document.createElement('pre');
+      codeSnippet.classList.add('code-snippet');
+      codeSnippet.innerHTML = codeHTML;
 
-    const codeSnippet = document.createElement('pre');
-    codeSnippet.classList.add('code-snippet');
-    codeSnippet.innerHTML = "<span class='comment'>// Initializing the messaging service</span>\n<span class='keyword'>const</span> messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>);";
+      const details = document.createElement('div');
+      details.classList.add('project-details');
+      details.innerHTML = detailsHTML;
 
-    projectCard.appendChild(projectTitle);
-    projectCard.appendChild(projectDesc);
-    projectCard.appendChild(codeSnippet);
-    projectCard.appendChild(projectDetails);
+      card.append(title, desc, codeSnippet, details);
+      card.addEventListener('click', () => card.classList.toggle('expanded'));
+      return card;
+    };
 
-    projectCard.addEventListener('click', () => {
-      projectCard.classList.toggle('expanded');
-    });
-    projectsContainer.appendChild(projectCard);
+    const card1 = createCard(
+      'Nexa',
+      'Decentralized messaging service.',
+      `<span class='comment'>// Initializing the messaging service</span>
+<span class='keyword'>const</span> messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>);`,
+      "Developed in Python with a team of four. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
+    );
 
-    const projectCard2 = document.createElement('div');
-    projectCard2.classList.add('project-card');
+    const card2 = createCard(
+      'Test Blockchain in Python',
+      'Creating a simple blockchain.',
+      `<span class='comment'># Initializing the blockchain</span>
+<span class='keyword'>def</span> <span class='function'>create_blockchain</span>():
+    <span class='keyword'>return</span> [<span class='string'>'genesis block'</span>]`,
+      "Developed solo. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>"
+    );
 
-    const projectTitle2 = document.createElement('h4');
-    projectTitle2.textContent = 'Test Blockchain in Python';
-
-    const projectDesc2 = document.createElement('p');
-    projectDesc2.textContent = "Creating a simple blockchain.";
-
-    const projectDetails2 = document.createElement('div');
-    projectDetails2.classList.add('project-details');
-    projectDetails2.innerHTML = "Developed solo. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>";
-
-    const codeSnippet2 = document.createElement('pre');
-    codeSnippet2.classList.add('code-snippet');
-    codeSnippet2.innerHTML = "<span class='comment'># Initializing the blockchain</span>\n<span class='keyword'>def</span> <span class='function'>create_blockchain</span>():\n    <span class='keyword'>return</span> [<span class='string'>'genesis block'</span>]";
-
-    projectCard2.appendChild(projectTitle2);
-    projectCard2.appendChild(projectDesc2);
-    projectCard2.appendChild(codeSnippet2);
-    projectCard2.appendChild(projectDetails2);
-
-    projectCard2.addEventListener('click', () => {
-      projectCard2.classList.toggle('expanded');
-    });
-    projectsContainer.appendChild(projectCard2);
-
-    projectsSection.appendChild(heading);
-    projectsSection.appendChild(projectsContainer);
+    projectsContainer.append(card1, card2);
+    projectsSection.append(heading, projectsContainer);
     this.container.appendChild(projectsSection);
   }
 
@@ -350,23 +315,19 @@ class Portfolio {
     const paragraph = document.createElement('p');
     paragraph.textContent = "Discord: 0xZKnw  |  GitHub: 0xZKnw  |  Twitter: 0xZKnw";
 
-    contactSection.appendChild(heading);
-    contactSection.appendChild(paragraph);
+    contactSection.append(heading, paragraph);
     this.container.appendChild(contactSection);
   }
 
   private initScrollAnimations(): void {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-appear');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-appear');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
 
     document.querySelectorAll('.scroll-element').forEach(element => {
       observer.observe(element);
