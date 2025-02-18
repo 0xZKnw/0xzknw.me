@@ -102,10 +102,17 @@ class Portfolio {
         color: #c5c8c6;
         line-height: 1.5;
       }
+      .projects-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        justify-content: space-around;
+        margin-top: 10px;
+      }
       .project-card {
-        flex: 1 1 45%;
+        flex: 1 1 40%;
         background-color: #2d2d2d;
-        padding: 20px;
+        padding: 10px; /* padding réduit pour une hauteur moindre */
         border-radius: 4px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         cursor: pointer;
@@ -246,13 +253,7 @@ class Portfolio {
     heading.textContent = 'My Projects:';
 
     const projectsContainer = document.createElement('div');
-    projectsContainer.style.cssText = `
-      display: flex;
-      flex-wrap: wrap;
-      gap: 60px;
-      justify-content: space-around;
-      margin-top: 10px;
-    `;
+    projectsContainer.classList.add('projects-container');
 
     const createCard = (
       titleText: string,
@@ -282,14 +283,16 @@ class Portfolio {
       return card;
     };
 
+    // Projet Nexa
     const card1 = createCard(
       'Nexa',
       'Decentralized messaging service.',
-      `<span class='comment'>// Initializing the messaging service</span>
+      `<span class='comment'>// Initializing Nexa</span>
 <span class='keyword'>const</span> messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>);`,
       "Developed in Python with a team of four. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
     );
 
+    // Projet Test Blockchain in Python
     const card2 = createCard(
       'Test Blockchain in Python',
       'Creating a simple blockchain.',
@@ -299,7 +302,17 @@ class Portfolio {
       "Developed solo. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>"
     );
 
-    projectsContainer.append(card1, card2);
+    // Projet Template (nouveau projet)
+    const card3 = createCard(
+      '0xZKnw.me',
+      'This Website',
+      `<span class='comment'>// Initializing 0xZKnw.me</span>
+<span class='keyword'>import</span> <span>axios</span>;
+<span>axios</span>.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
+      "Template project developed for demonstration purposes. GitHub: <a href='#'>TemplateRepo</a>"
+    );
+
+    projectsContainer.append(card1, card2, card3);
     projectsSection.append(heading, projectsContainer);
     this.container.appendChild(projectsSection);
   }
