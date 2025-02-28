@@ -1,47 +1,42 @@
-# 0xzknw.me - My Portfolio
+# 0xzknw.me - My Personal Portfolio
 
-Welcome to my personal portfolio website, built with TypeScript, showcasing my work and projects.
+Welcome to **0xzknw.me**, my personal portfolio website. This project showcases my web development skills and projects. Built with **TypeScript**, this site showcase my projects.
 
-## About
+---
 
-This website serves as a portfolio to display my skills and projects in web development. It is built using TypeScript, HTML, and JavaScript.
+## 🚀 About This Project
 
-## Files:
+This website serves as a professional portfolio, featuring my skills, projects, and accomplishments in the world of development. The website is developed using **TypeScript** for functionality, structure, and additional client-side logic. 
 
-- **index.html**: The main structure of the website.
-- **index.ts**: TypeScript website's code.
-- **index.js**: JavaScript code transpiled from TypeScript.
+---
 
-## Setup
+## 🗂️ Project Structure
 
-1. Clone the repository:
+Here's a quick overview of the files and their purpose:
 
-    ```bash
-    git clone https://github.com/0xZKnw/0xzknw.me.git
-    ```
+- **`index.html`**: The main structure of the website. Contains the core HTML elements.
+- **`index.ts`**: TypeScript website's code.
+- **`index.js`**: JavaScript output from the TypeScript code, ready for the browser.
 
-2. Navigate to the project folder:
+---
 
-    ```bash
-    cd 0xzknw.me
-    ```
+## 💡 Contributing
 
-3. Install dependencies:
+Contributions are always welcome! Feel free to **fork** the repository and submit **pull requests** with improvements or fixes.
 
-    ```bash
-    npm install
-    ```
+---
 
-4. Run the project:
+## 📄 License
 
-    ```bash
-    npm start
-    ```
+This project is **open-source**. You're free to modify, distribute, and use the code as you see fit.
 
-## Contributing
+---
 
-Feel free to fork the repo and submit pull requests!
+## 🧑‍💻 Technologies Used
 
-## License
+- **TypeScript**
 
-This project is open-source and does not have a specific license. Feel free to modify and distribute it as you wish.
+---
+
+Thank you for visiting my portfolio! 🙌
+
