@@ -24,47 +24,62 @@ class Portfolio {
 
     document.body.style.cssText = `
       margin: 0;
-      font-family: 'Ubuntu', monospace;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
       font-size: 16px;
-      background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
+      background: #0a0a0a;
+      color: #e2e6ea;
     `;
 
     const style = document.createElement('style');
     style.textContent = `
+      :root {
+        --background-color: #0a0a0a; /* Noir profond */
+        --text-color: #e2e6ea;
+        --container-bg: #181818; /* Conteneur proche du noir */
+        --container-border: #333333;
+        --container-hover-border: #444444;
+        --snippet-bg: #121212;
+        --snippet-text: #adbac7;
+        --keyword-color: #ff7b72;
+        --string-color: #a5d6ff;
+        --function-color: #d2a8ff;
+      }
+
       html {
         scroll-behavior: smooth;
-      }
-      ::-webkit-scrollbar {
-        display: none;
+        background: var(--background-color);
       }
       body {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+        font-size: 16px;
+        background: var(--background-color);
+        color: var(--text-color);
       }
+
       .ide-container {
-        background-color: #252a34;
+        background-color: var(--container-bg);
         padding: 40px 60px 30px;
         border-radius: 6px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         max-width: 1280px;
         width: 80vw;
-        aspect-ratio: 16 / 9;
         overflow: auto;
         margin: 80px auto;
-        border: 1px solid #3a3f51;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--container-border);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
         display: flex;
         flex-direction: column;
         position: relative;
       }
       .ide-container:hover {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        border-color: var(--container-hover-border);
       }
       .ide-header {
-        background: #3a3f51;
-        height: 25px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
+        background: var(--container-border);
+        height: 20px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -81,35 +96,34 @@ class Portfolio {
         border-radius: 50%;
         margin-left: 5px;
       }
-      .ide-header .close { background-color: #ff5f56; }
-      .ide-header .minimize { background-color: #ffbd2e; }
-      .ide-header .maximize { background-color: #27c93f; }
+      .ide-header .close { background-color: #5ac05a; }
+      .ide-header .minimize { background-color: #f9c846; }
+      .ide-header .maximize { background-color: #ff5c5c; }
       header {
-        border-bottom: 1px solid #3a3f51;
+        border-bottom: 1px solid var(--container-border);
         padding-bottom: 10px;
         margin-top: 40px;
       }
       header h1, header h2 {
-        color: #d8dee9;
+        color: var(--text-color);
         margin: 0;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
       }
       header h2 {
         font-size: 0.85em;
-        color: #8abeb7;
+        color: #8b949e;
         margin-top: 5px;
       }
       section {
         margin-bottom: 30px;
       }
       section h3 {
-        color: #d8dee9;
-        border-bottom: 1px solid #3a3f51;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--container-border);
         padding-bottom: 5px;
         margin-bottom: 15px;
       }
       section p {
-        color: #c5c8c6;
+        color: #8b949e;
         line-height: 1.5;
       }
       .projects-container {
@@ -121,23 +135,23 @@ class Portfolio {
       }
       .project-card {
         flex: 1 1 40%;
-        background-color: #2b3240;
+        background-color: var(--container-bg);
         padding: 10px;
         border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
-        border: 1px solid #3a3f51;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+        border: 1px solid var(--container-border);
       }
       .project-card:hover {
-        transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        border-color: #8abeb7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        border-color: var(--container-hover-border);
       }
-      .project-card h4 { color: #8abeb7; margin-bottom: 10px; }
-      .project-card p { font-size: 0.95em; color: #c5c8c6; line-height: 1.4; }
+      .project-card h4 { color: var(--function-color); margin-bottom: 10px; }
+      .project-card p { font-size: 0.95em; color: #8b949e; line-height: 1.4; }
       .project-details {
         max-height: 0;
         overflow: hidden;
@@ -145,31 +159,31 @@ class Portfolio {
         transition: max-height 0.5s ease, opacity 0.5s ease;
         font-size: 0.9em;
         margin-top: 10px;
-        color: #c5c8c6;
       }
       .project-card.expanded .project-details {
         max-height: 400px;
         opacity: 1;
       }
       .project-details a {
-        color: #81a2be;
+        color: var(--function-color);
         text-decoration: none;
       }
       .project-details a:hover { text-decoration: underline; }
       .code-snippet {
-        background: #1e1e1e;
-        color: #e6e6e6;
+        background: var(--snippet-bg); /* Utilise la couleur définie dans :root, ici #121212 */
+        color: #f8f8f2; /* Texte clair */
         border-radius: 4px;
         padding: 10px;
         margin-top: 10px;
-        font-family: 'Gill Sans', monospace;
+        font-family: "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace; // police d'IDE
         font-size: 0.9em;
         overflow-x: auto;
+        border: 1px solid var(--container-border);
       }
-      .code-snippet .keyword { color: #f92672; }
-      .code-snippet .string { color: #e6db74; }
-      .code-snippet .function { color: #a6e22e; }
-      .code-snippet .comment { display: none; }
+      .code-snippet .keyword { color: #f92672; }   /* Rouge vif */
+      .code-snippet .string { color: #e6db74; }    /* Jaune doux */
+      .code-snippet .function { color: #a6e22e; }   /* Vert */
+      .code-snippet .comment { color: #75715e; }    /* Gris */
       .scroll-element {
         opacity: 0;
         transform: translateY(20px);
@@ -182,29 +196,30 @@ class Portfolio {
         to { opacity: 1; transform: translateY(0); }
       }
       @keyframes startupAnimation {
-        0% { opacity: 0; transform: scale(0.8) rotateX(10deg); }
-        100% { opacity: 1; transform: scale(1) rotateX(0deg); }
+        0% { opacity: 0; transform: translateY(-20px) scale(0.9); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
       }
       .startup {
         animation: startupAnimation 1s ease-out forwards;
       }
-      /* Splash Screen Styles */
+      /* Splash Screen Styles with a slightly enhanced gradient */
       #splash-screen {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
+        background: linear-gradient(135deg, var(--background-color) 0%, #0d0d0d 100%);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 9999;
       }
       #splash-screen div {
-        font-family: 'Ubuntu', monospace;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
         font-size: 3em;
-        color: #d8dee9;
+        color: var(--text-color);
+        font-weight: bold;
       }
       .splash-out {
         animation: splashOut 1s ease forwards;
@@ -215,14 +230,12 @@ class Portfolio {
       }
       @media (max-width: 600px) {
         body {
-          font-family: 'Ubuntu', monospace;
           font-size: 15px;
         }
         .ide-container {
           width: 95vw;
           padding: 20px 30px;
           margin: 20px auto;
-          aspect-ratio: auto;
           box-sizing: border-box;
         }
         header h1 {
@@ -235,6 +248,13 @@ class Portfolio {
           font-size: 1.2em;
         }
         .project-card { flex: 1 1 100%; }
+      }
+      /* Animation for social icons on hover */
+      .social-icon {
+        transition: transform 0.3s ease;
+      }
+      .social-icon:hover {
+        transform: scale(1.2);
       }
     `;
     document.head.appendChild(style);
@@ -250,12 +270,9 @@ class Portfolio {
     splash.appendChild(pseudo);
     document.body.appendChild(splash);
 
-    // Après 2 secondes, on lance l'animation de disparition
     setTimeout(() => {
       splash.classList.add('splash-out');
-      splash.addEventListener('animationend', () => {
-        splash.remove();
-      });
+      splash.addEventListener('animationend', () => splash.remove());
     }, 2000);
   }
 
@@ -288,7 +305,7 @@ class Portfolio {
     title.textContent = '0xZKnw';
 
     const subtitle = document.createElement('h2');
-    subtitle.textContent = 'Developer | Blockchain Enthusiast';
+    subtitle.textContent = 'Blockchain Developer & Technologist';
 
     header.append(title, subtitle);
     this.container.appendChild(header);
@@ -303,7 +320,7 @@ class Portfolio {
     heading.textContent = 'About me:';
 
     const paragraph = document.createElement('p');
-    paragraph.textContent = "Computer science student, passionate about development and blockchains. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
+    paragraph.textContent = "Computer science student passionate about blockchain and cutting–edge technology. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
 
     aboutSection.append(heading, paragraph);
     this.container.appendChild(aboutSection);
@@ -351,10 +368,10 @@ class Portfolio {
 
     const Nexa = createCard(
       'Nexa',
-      'Decentralized messaging service.',
+      'Decentralized messaging service on blockchain.',
       `<span class='keyword'>from</span> <span class='function'>Nexa</span> <span class='keyword'>import</span> <span class='function'>initService</span>
 messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>)`,
-      "Developed in Python with a team of four. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
+      "Developed with a team in Python. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
     );
 
     const BC_Test = createCard(
@@ -367,7 +384,7 @@ messaging = <span class='function'>initService</span>(<span class='string'>'Nexa
 
     const ZKnwMe = createCard(
       '0xZKnw.me',
-      'This Website',
+      'This Website with blockchain integrations.',
       `<span class='keyword'>import</span> axios;
 axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
       "Developed solo in TypeScript. GitHub: <a href='https://github.com/0xZKnw/0xzknw.me'>0xZKnw.me</a>"
@@ -375,7 +392,7 @@ axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'
 
     const PwdMng = createCard(
       'PwdMng',
-      'A password manager made in Python.',
+      'A password manager with secure blockchain storage.',
       `<span class='keyword'>import</span> cryptography
 <span class='keyword'>def</span> <span class='function'>encrypt_password</span>(password):
     <span class='keyword'>return</span> cryptography.<span class='function'>encrypt</span>(password)`,
@@ -390,18 +407,41 @@ axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'
   private addContactSection(): void {
     const contactSection = document.createElement('section');
     contactSection.classList.add('scroll-element');
-    contactSection.style.textAlign = 'left';
+    contactSection.style.textAlign = 'center';
 
     const heading = document.createElement('h3');
     heading.textContent = 'Contact';
 
-    const paragraph = document.createElement('p');
-    paragraph.textContent = "Discord: 0xZKnw  |  GitHub: 0xZKnw  |  Twitter: 0xZKnw";
+    const iconsContainer = document.createElement('div');
+    iconsContainer.style.display = 'flex';
+    iconsContainer.style.justifyContent = 'center';
+    iconsContainer.style.gap = '20px';
+    iconsContainer.style.marginTop = '10px';
 
-    const attention = document.createElement('p');
-    attention.textContent = "This site is better viewed on a desktop.";
+    const createIconLink = (href: string, imgSrc: string, altText: string): HTMLAnchorElement => {
+      const link = document.createElement('a');
+      link.href = href;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
 
-    contactSection.append(heading, paragraph, attention);
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      img.alt = altText;
+      img.style.width = '32px';
+      img.style.height = '32px';
+      img.classList.add('social-icon');
+
+      link.appendChild(img);
+      return link;
+    };
+
+    const discordIcon = createIconLink('https://discord.com/users/0xZKnw', './img/discord.svg', 'Discord');
+    const githubIcon = createIconLink('https://github.com/0xZKnw', './img/github.svg', 'GitHub');
+    const twitterIcon = createIconLink('https://twitter.com/0xZKnw', './img/x.svg', 'Twitter');
+    const linkedinIcon = createIconLink('https://www.linkedin.com/in/justin-olivier-1a6b0a31a/', './img/linkedin.svg', 'LinkedIn');
+
+    iconsContainer.append(discordIcon, githubIcon, twitterIcon, linkedinIcon);
+    contactSection.append(heading, iconsContainer);
     this.container.appendChild(contactSection);
   }
 
