@@ -3,6 +3,7 @@ class Portfolio {
 
   constructor() {
     this.applyGlobalStyles();
+    this.showSplashScreen();
     this.createContainer();
     this.addHeader();
     this.addAboutSection();
@@ -23,9 +24,9 @@ class Portfolio {
 
     document.body.style.cssText = `
       margin: 0;
-      font-family: Ubuntu, monospace;
+      font-family: 'Ubuntu', monospace;
       font-size: 16px;
-      background: linear-gradient(135deg, #0d1117 0%, #010409 100%);
+      background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
     `;
 
     const style = document.createElement('style');
@@ -41,28 +42,32 @@ class Portfolio {
         scrollbar-width: none;
       }
       .ide-container {
-        background-color: #1e1e1e;
+        background-color: #252a34;
         padding: 40px 60px 30px;
         border-radius: 6px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
         max-width: 1280px;
         width: 80vw;
         aspect-ratio: 16 / 9;
         overflow: auto;
         margin: 80px auto;
-        border: 1px solid #333;
-        transition: transform 0.3s ease;
+        border: 1px solid #3a3f51;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         display: flex;
         flex-direction: column;
         position: relative;
       }
+      .ide-container:hover {
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      }
       .ide-header {
-        background: #333;
+        background: #3a3f51;
         height: 25px;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         padding: 0 10px;
         position: absolute;
         top: 0;
@@ -74,19 +79,20 @@ class Portfolio {
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        margin-right: 5px;
+        margin-left: 5px;
       }
-      .ide-header .close { background-color: #FF5F56; }
-      .ide-header .minimize { background-color: #FFBD2E; }
-      .ide-header .maximize { background-color: #27C93F; }
+      .ide-header .close { background-color: #ff5f56; }
+      .ide-header .minimize { background-color: #ffbd2e; }
+      .ide-header .maximize { background-color: #27c93f; }
       header {
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid #3a3f51;
         padding-bottom: 10px;
         margin-top: 40px;
       }
       header h1, header h2 {
-        color: #c5c8c6;
+        color: #d8dee9;
         margin: 0;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
       }
       header h2 {
         font-size: 0.85em;
@@ -97,8 +103,8 @@ class Portfolio {
         margin-bottom: 30px;
       }
       section h3 {
-        color: #c5c8c6;
-        border-bottom: 1px solid #333;
+        color: #d8dee9;
+        border-bottom: 1px solid #3a3f51;
         padding-bottom: 5px;
         margin-bottom: 15px;
       }
@@ -115,19 +121,20 @@ class Portfolio {
       }
       .project-card {
         flex: 1 1 40%;
-        background-color: #2d2d2d;
+        background-color: #2b3240;
         padding: 10px;
         border-radius: 4px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #333;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+        border: 1px solid #3a3f51;
       }
       .project-card:hover {
-        transform: scale(1.03);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        border-color: #8abeb7;
       }
       .project-card h4 { color: #8abeb7; margin-bottom: 10px; }
       .project-card p { font-size: 0.95em; color: #c5c8c6; line-height: 1.4; }
@@ -150,18 +157,18 @@ class Portfolio {
       }
       .project-details a:hover { text-decoration: underline; }
       .code-snippet {
-        background: #272822;
-        color: #F8F8F2;
+        background: #1e1e1e;
+        color: #e6e6e6;
         border-radius: 4px;
         padding: 10px;
         margin-top: 10px;
-        font-family: "Gill Sans", monospace;
+        font-family: 'Gill Sans', monospace;
         font-size: 0.9em;
         overflow-x: auto;
       }
-      .code-snippet .keyword { color: #F92672; }
-      .code-snippet .string { color: #E6DB74; }
-      .code-snippet .function { color: #A6E22E; }
+      .code-snippet .keyword { color: #f92672; }
+      .code-snippet .string { color: #e6db74; }
+      .code-snippet .function { color: #a6e22e; }
       .code-snippet .comment { display: none; }
       .scroll-element {
         opacity: 0;
@@ -181,9 +188,34 @@ class Portfolio {
       .startup {
         animation: startupAnimation 1s ease-out forwards;
       }
+      /* Splash Screen Styles */
+      #splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+      #splash-screen div {
+        font-family: 'Ubuntu', monospace;
+        font-size: 3em;
+        color: #d8dee9;
+      }
+      .splash-out {
+        animation: splashOut 1s ease forwards;
+      }
+      @keyframes splashOut {
+        0% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; transform: scale(0.9); }
+      }
       @media (max-width: 600px) {
         body {
-          font-family: Ubuntu, monospace;
+          font-family: 'Ubuntu', monospace;
           font-size: 15px;
         }
         .ide-container {
@@ -206,6 +238,25 @@ class Portfolio {
       }
     `;
     document.head.appendChild(style);
+  }
+
+  private showSplashScreen(): void {
+    const splash = document.createElement('div');
+    splash.id = 'splash-screen';
+
+    const pseudo = document.createElement('div');
+    pseudo.textContent = '0xZKnw';
+
+    splash.appendChild(pseudo);
+    document.body.appendChild(splash);
+
+    // Après 2 secondes, on lance l'animation de disparition
+    setTimeout(() => {
+      splash.classList.add('splash-out');
+      splash.addEventListener('animationend', () => {
+        splash.remove();
+      });
+    }, 2000);
   }
 
   private createContainer(): void {
@@ -298,15 +349,15 @@ class Portfolio {
       return card;
     };
 
-    const card1 = createCard(
+    const Nexa = createCard(
       'Nexa',
       'Decentralized messaging service.',
       `<span class='keyword'>from</span> <span class='function'>Nexa</span> <span class='keyword'>import</span> <span class='function'>initService</span>
-</span>messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>)`,
+messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>)`,
       "Developed in Python with a team of four. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
     );
 
-    const card2 = createCard(
+    const BC_Test = createCard(
       'Test Blockchain in Python',
       'Creating a simple blockchain.',
       `<span class='keyword'>def</span> <span class='function'>create_blockchain</span>():
@@ -314,24 +365,24 @@ class Portfolio {
       "Developed solo in Python. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>"
     );
 
-    const card3 = createCard(
+    const ZKnwMe = createCard(
       '0xZKnw.me',
       'This Website',
       `<span class='keyword'>import</span> axios;
 axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
-      "Developed solo in TypeScript. GitHub: <a href='https://github.com/0xZKnw/0xzknw.fr'>0xZKnw.me</a>"
+      "Developed solo in TypeScript. GitHub: <a href='https://github.com/0xZKnw/0xzknw.me'>0xZKnw.me</a>"
     );
 
-    const card4 = createCard(
-      'Old Portfolio',
-      'My old portfolio.',
-      `<<span class='keyword'>head</span>>
-      <<span class='keyword'>title</span>><span class="string">old.0xZKnw.me</span><<span class='keyword'>/title</span>>
-<<span class="keyword">/head</span>>`,
-      'My old portfolio, built exclusively with HTML and CSS. Site : <a href="https://old-0xzknw.netlify.app">Old Portfolio</a>'
+    const PwdMng = createCard(
+      'PwdMng',
+      'A password manager made in Python.',
+      `<span class='keyword'>import</span> cryptography
+<span class='keyword'>def</span> <span class='function'>encrypt_password</span>(password):
+    <span class='keyword'>return</span> cryptography.<span class='function'>encrypt</span>(password)`,
+      'Developed solo in Python. GitHub: <a href="https://github.com/0xZKnw/PwdMng">PwdMng</a>'
     );
 
-    projectsContainer.append(card1, card2, card3, card4);
+    projectsContainer.append(Nexa, PwdMng, ZKnwMe, BC_Test);
     projectsSection.append(heading, projectsContainer);
     this.container.appendChild(projectsSection);
   }
