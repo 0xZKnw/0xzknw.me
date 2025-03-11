@@ -28,6 +28,11 @@ class Portfolio {
       font-size: 16px;
       background: #0a0a0a;
       color: #e2e6ea;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     `;
 
     const style = document.createElement('style');
@@ -48,6 +53,8 @@ class Portfolio {
       html {
         scroll-behavior: smooth;
         background: var(--background-color);
+        height: 100%;
+        overflow: hidden;
       }
       body {
         margin: 0;
@@ -55,6 +62,8 @@ class Portfolio {
         font-size: 16px;
         background: var(--background-color);
         color: var(--text-color);
+        height: 100%;
+        overflow: hidden;
       }
 
       .ide-container {
@@ -64,19 +73,30 @@ class Portfolio {
         box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         max-width: 1280px;
         width: 80vw;
-        overflow: auto;
-        margin: 80px auto;
+        height: 80vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin: 0;
         border: 1px solid var(--container-border);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         display: flex;
         flex-direction: column;
         position: relative;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
       }
+      
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .ide-container::-webkit-scrollbar {
+        display: none;
+      }
+      
       .ide-container:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         border-color: var(--container-hover-border);
       }
+      
       .ide-header {
         background: var(--container-border);
         height: 20px;
@@ -84,21 +104,13 @@ class Portfolio {
         align-items: center;
         justify-content: flex-end;
         padding: 0 10px;
-        position: absolute;
+        position: sticky;
         top: 0;
         left: 0;
         right: 0;
         z-index: 10;
       }
-      .ide-header div {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-left: 5px;
-      }
-      .ide-header .close { background-color: #5ac05a; }
-      .ide-header .minimize { background-color: #f9c846; }
-      .ide-header .maximize { background-color: #ff5c5c; }
+      
       header {
         border-bottom: 1px solid var(--container-border);
         padding-bottom: 10px;
@@ -264,16 +276,74 @@ class Portfolio {
     const splash = document.createElement('div');
     splash.id = 'splash-screen';
 
-    const pseudo = document.createElement('div');
-    pseudo.textContent = '0xZKnw';
-
-    splash.appendChild(pseudo);
+    const pseudoContainer = document.createElement('div');
+    const pseudo = document.createElement('span');
+    pseudoContainer.appendChild(pseudo);
+    splash.appendChild(pseudoContainer);
     document.body.appendChild(splash);
 
-    setTimeout(() => {
-      splash.classList.add('splash-out');
-      splash.addEventListener('animationend', () => splash.remove());
-    }, 2000);
+    const finalText = '0xZKnw';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/';
+    let iteration = 0;
+    const totalIterations = 40;
+    
+    // Add the scramble animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes textGlow {
+        0% { text-shadow: 0 0 8px rgba(226, 230, 234, 0.7); }
+        50% { text-shadow: 0 0 16px rgba(226, 230, 234, 0.9); }
+        100% { text-shadow: 0 0 8px rgba(226, 230, 234, 0.7); }
+      }
+      
+      #splash-screen span {
+        font-family: monospace;
+        animation: textGlow 2s infinite;
+        letter-spacing: 0.2em;
+        font-weight: bold;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Scramble animation function
+    const scrambleText = () => {
+      // Determine how many characters should be finalized
+      const finalizedCount = Math.floor((iteration / totalIterations) * finalText.length);
+      
+      let result = '';
+      
+      // Add finalized characters (they won't change anymore)
+      for (let i = 0; i < finalizedCount; i++) {
+        result += finalText[i];
+      }
+      
+      // Add scrambled characters for the rest
+      for (let i = finalizedCount; i < finalText.length; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+      }
+      
+      // Update the text
+      pseudo.textContent = result;
+      
+      // Slow down the animation over time
+      const delay = Math.pow(iteration / totalIterations, 2) * 100 + 30;
+      
+      iteration++;
+      
+      // Continue scrambling if not done
+      if (iteration <= totalIterations) {
+        setTimeout(scrambleText, delay);
+      } else {
+        // When scramble is done, wait a bit before fading out
+        setTimeout(() => {
+          splash.classList.add('splash-out');
+          splash.addEventListener('animationend', () => splash.remove());
+        }, 1000);
+      }
+    };
+
+    // Start the scramble animation
+    setTimeout(scrambleText, 500);
   }
 
   private createContainer(): void {
@@ -289,11 +359,14 @@ class Portfolio {
     });
     this.container.appendChild(ideHeader);
 
+    // Modified hover effect to avoid pushing content out of view
     this.container.addEventListener('mouseenter', () => {
-      this.container.style.transform = 'scale(1.02)';
+      this.container.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
+      this.container.style.borderColor = 'var(--container-hover-border)';
     });
     this.container.addEventListener('mouseleave', () => {
-      this.container.style.transform = 'scale(1)';
+      this.container.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+      this.container.style.borderColor = 'var(--container-border)';
     });
   }
 
