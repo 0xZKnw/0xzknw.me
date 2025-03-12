@@ -592,7 +592,7 @@ messaging = <span class='function'>initService</span>(<span class='string'>'Nexa
 
     const anovlt = createCard(
       'AnoVlt',
-      'Encrypt your messages asymmetrically.',
+      'Encrypt your files asymmetrically.',
       `<span class='keyword'>import</span> <span class='string'>'eciesgo'</span>
 <span class='keyword'>func</span> <span class='function'>anovlt</span>(pub <span class='keyword'>string</span>) *<span class='function'>eciesgo</span>.secrets {
     <span class='keyword'>return</span> eciesgo.<span class='function'>Encrypt</span>(pub, <span class='string'>'secrets.zip'</span>)
