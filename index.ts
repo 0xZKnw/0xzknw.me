@@ -1,682 +1,671 @@
 class Portfolio {
-  private container: HTMLDivElement;
-  private contentArea: HTMLDivElement;
+  private contentWrapper: HTMLDivElement;
+  private observer: IntersectionObserver | null = null;
 
   constructor() {
-    this.applyGlobalStyles();
-    this.showSplashScreen();
-    this.createContainer();
-    this.addHeader();
-    this.addAboutSection();
-    this.addProjectsSection();
-    this.addContactSection();
-    document.body.appendChild(this.container);
-    this.container.classList.add('startup');
-    this.initScrollAnimations();
+      this.applyGlobalStyles();
+      this.showSplashScreen();
+  }
+
+  private initPortfolio(): void {
+      this.createContentWrapper();
+      this.addHeaderContent();
+      this.addAboutSection();
+      this.addProjectsSection();
+      this.addContactSection();
+      document.body.appendChild(this.contentWrapper);
+
+      requestAnimationFrame(() => {
+          this.contentWrapper.classList.add('startup');
+      });
+
+      this.initScrollAnimations();
+      this.initInteractiveElements(); // Added mouse follow effect here
   }
 
   private applyGlobalStyles(): void {
-    if (!document.head.querySelector("meta[name='viewport']")) {
-      const meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1.0';
-      document.head.appendChild(meta);
-    }
-
-    document.body.style.cssText = `
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-      font-size: 16px;
-      background: #0a0a0a;
-      color: #e2e6ea;
-      overflow: hidden;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    `;
-
-    const style = document.createElement('style');
-    style.textContent = `
-      :root {
-        --background-color: #0a0a0a;
-        --text-color: #e2e6ea;
-        --container-bg: #181818;
-        --container-border: #333333;
-        --container-hover-border: #444444;
-        --snippet-bg: #121212;
-        --snippet-text: #adbac7;
-        --keyword-color: #ff7b72;
-        --string-color: #a5d6ff;
-        --function-color: #d2a8ff;
-        --header-bg: #232323;
+      if (!document.head.querySelector("meta[name='viewport']")) {
+          const meta = document.createElement('meta');
+          meta.name = 'viewport';
+          meta.content = 'width=device-width, initial-scale=1.0';
+          document.head.appendChild(meta);
       }
 
-      html {
-        scroll-behavior: smooth;
-        background: var(--background-color);
-        height: 100%;
-        overflow: hidden;
-      }
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-        font-size: 16px;
-        background: var(--background-color);
-        color: var(--text-color);
-        height: 100%;
-        overflow: hidden;
-      }
+      const fontLink = document.createElement('link');
+      fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap';
+      fontLink.rel = 'stylesheet';
+      document.head.appendChild(fontLink);
 
-      .ide-container {
-        background-color: var(--container-bg);
-        padding: 0;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        max-width: 1280px;
-        width: 85vw;
-        height: 85vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-        margin: 0;
-        border: 1px solid var(--container-border);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-      
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      .ide-container::-webkit-scrollbar {
-        display: none;
-      }
-      
-      .ide-container:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        border-color: var(--container-hover-border);
-      }
-      
-      .ide-header {
-        background: var(--header-bg);
-        height: 80px !important; /* Forcer la hauteur à 80px */
-        display: flex;
-        align-items: center;
-        padding: 0;
-        position: sticky;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 10;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-      }
-      
-      .traffic-lights {
-        display: flex;
-        margin-left: 12px;
-        margin-right: auto;
-        margin-top: 4px;
-        margin-bottom: 4px;
-        align-items: center;
-        height: 100%;
-      }
-      
-      .traffic-light {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 8px;
-        position: relative;
-        /* Create shadow effect for more depth */
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) inset;
-      }
-      
-      .traffic-light.close {
-        background-color: #ff5f57;
-        border: 0.5px solid #e0443e;
-      }
-      
-      .traffic-light.minimize {
-        background-color: #ffbd2e;
-        border: 0.5px solid #dea123;
-      }
-      
-      .traffic-light.maximize {
-        background-color: #28c940;
-        border: 0.5px solid #1aab29;
-      }
-      
-      .traffic-light:hover::before {
-        content: "";
-        position: absolute;
-        top: 3.5px;
-        left: 3.5px;
-        width: 5px;
-        height: 5px;
-        opacity: 0.7;
-      }
-      
-      .traffic-light.close:hover::before {
-        content: "×";
-        font-size: 10px;
-        line-height: 1px;
-        text-align: center;
-        color: #4d0000;
-        opacity: 0.7;
-      }
-      
-      .traffic-light.minimize:hover::before {
-        content: "";
-        background: #975500;
-        height: 1px;
-        width: 8px;
-        top: 5.5px;
-        left: 2px;
-      }
-      
-      .traffic-light.maximize:hover::before {
-        content: "";
-        background: #006500;
-        height: 1px;
-        width: 8px;
-        top: 5.5px;
-        left: 2px;
-        box-shadow: 0 -3px 0 #006500, 0 3px 0 #006500;
-      }
-      
-      .title-bar {
-        position: absolute;
-        left: 0;
-        right: 0;
-        text-align: center;
-        color: #aaa;
-        font-size: 13px;
-        font-weight: 400;
-        pointer-events: none;
-        user-select: none;
-      }
-      
-      .content-area {
-        padding: 40px 60px 30px;
-        flex: 1;
-      }
-      
-      header {
-        border-bottom: 1px solid var(--container-border);
-        padding-bottom: 10px;
-        margin-top: 10px;
-      }
-      header h1, header h2 {
-        color: var(--text-color);
-        margin: 0;
-      }
-      header h2 {
-        font-size: 0.85em;
-        color: #8b949e;
-        margin-top: 5px;
-      }
-      section {
-        margin-bottom: 30px;
-      }
-      section h3 {
-        color: var(--text-color);
-        border-bottom: 1px solid var(--container-border);
-        padding-bottom: 5px;
-        margin-bottom: 15px;
-      }
-      section p {
-        color: #8b949e;
-        line-height: 1.5;
-      }
-      .projects-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 40px;
-        justify-content: space-around;
-        margin-top: 10px;
-      }
-      .project-card {
-        flex: 1 1 40%;
-        background-color: var(--container-bg);
-        padding: 10px;
-        border-radius: 4px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
-        border: 1px solid var(--container-border);
-      }
-      .project-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        border-color: var(--container-hover-border);
-      }
-      .project-card h4 { color: var(--function-color); margin-bottom: 10px; }
-      .project-card p { font-size: 0.95em; color: #8b949e; line-height: 1.4; }
-      .project-details {
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: max-height 0.5s ease, opacity 0.5s ease;
-        font-size: 0.9em;
-        margin-top: 10px;
-      }
-      .project-card.expanded .project-details {
-        max-height: 400px;
-        opacity: 1;
-      }
-      .project-details a {
-        color: var(--function-color);
-        text-decoration: none;
-      }
-      .project-details a:hover { text-decoration: underline; }
-      .code-snippet {
-        background: var(--snippet-bg);
-        color: #f8f8f2;
-        border-radius: 4px;
-        padding: 10px;
-        margin-top: 10px;
-        font-family: "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-        font-size: 0.9em;
-        overflow-x: auto;
-        border: 1px solid var(--container-border);
-      }
-      .code-snippet .keyword { color: #f92672; }
-      .code-snippet .string { color: #e6db74; }
-      .code-snippet .function { color: #a6e22e; }
-      .code-snippet .comment { color: #75715e; }
-      .scroll-element {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      .animate-appear {
-        animation: fadeIn 0.8s ease forwards;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes startupAnimation {
-        0% { opacity: 0; transform: translateY(-20px) scale(0.9); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      .startup {
-        animation: startupAnimation 1s ease-out forwards;
-      }
-      /* Splash Screen Styles with a slightly enhanced gradient */
-      #splash-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: linear-gradient(135deg, var(--background-color) 0%, #0d0d0d 100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      }
-      #splash-screen div {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-        font-size: 3em;
-        color: var(--text-color);
-        font-weight: bold;
-      }
-      .splash-out {
-        animation: splashOut 1s ease forwards;
-      }
-      @keyframes splashOut {
-        0% { opacity: 1; transform: scale(1); }
-        100% { opacity: 0; transform: scale(0.9); }
-      }
-      @media (max-width: 600px) {
-        body {
-          font-size: 15px;
-          align-items: flex-start !important;
-          justify-content: flex-start !important;
-          padding-top: 10px;
-        }
-        .ide-container {
-          width: 95vw;
-          
-          
-          box-sizing: border-box;
-          height: 83vh !important;
-        }
-        header h1 {
-          font-size: 1.5em;
-        }
-        header h2 {
-          font-size: 1em;
-        }
-        section h3 {
-          font-size: 1.2em;
-        }
-        .ide-header {
-          height: 60px !important;
-          top: 0px !important;
-        }
-      }
+      document.body.style.cssText = `
+          margin: 0;
+          padding: 0;
+          background-color: var(--background-color, #080a10);
+          color: var(--text-color, #cccccc);
+          font-family: var(--font-body, 'Inter', sans-serif);
+          overflow-x: hidden;
+          opacity: 0;
+          transition: opacity 0.5s ease-in-out;
+          position: relative; /* Needed for pseudo-element positioning */
+      `;
 
-      @media (max-width: 400px) {
-        header h1 {
-          font-size: 1.3em;
-        }
-        header h2 {
-          font-size: 0.9em;
-        }
-        .content-area {
-          padding: 20px 30px 20px;
-        }
-        .ide-header {
-          height: 50px !important;
-          top: 0px !important;
-        }
-      }
+      const style = document.createElement('style');
+      style.textContent = `
+          :root {
+              --background-color: #080a10;
+              --primary-accent: #00c6ff;
+              --secondary-accent: #a04cff;
+              --gradient-start: #0d3a5c;
+              --gradient-end: #1a1f36;
+              --text-color: #d1d5db;
+              --text-heading-color: #ffffff;
+              --text-muted-color: #8a94a6;
+              --card-bg: rgba(26, 31, 54, 0.5);
+              --card-border: rgba(160, 76, 255, 0.15);
+              --card-hover-bg: rgba(36, 41, 64, 0.7);
+              --card-hover-border: rgba(0, 198, 255, 0.3);
+              --code-bg: #111827;
+              --code-text: #c5c8c6;
+              --code-scrollbar-track: #161e2b;
+              --code-scrollbar-thumb: #374151;
+              --code-scrollbar-thumb-hover: #4b5563;
+              --keyword-color: #569cd6;
+              --string-color: #ce9178;
+              --function-color: #dcdcaa;
+              --comment-color: #6a9955; /* Still needed for snippet syntax */
+              --font-body: 'Inter', sans-serif;
+              --font-code: 'Roboto Mono', monospace;
+              --section-padding: 80px 0;
+              --container-max-width: 1100px;
+              /* CSS variables for mouse position */
+              --mouse-x: 50%;
+              --mouse-y: 50%;
+          }
 
-      @media (max-width: 600px) {
-        .ide-header {
-          height: 50px !important;
-          top: 0px !important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
+          html {
+              scroll-behavior: smooth;
+              scrollbar-width: none;
+          }
+
+          body {
+              font-family: var(--font-body);
+              background: var(--background-color) linear-gradient(180deg, var(--gradient-start) 0%, var(--background-color) 30%);
+              color: var(--text-color);
+              line-height: 1.7;
+              overflow-x: hidden;
+              &::-webkit-scrollbar {
+                  display: none;
+              }
+               -ms-overflow-style: none;
+          }
+
+          /* Mouse Follow Effect */
+          body::after {
+              content: '';
+              position: fixed; /* Use fixed to cover viewport */
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              pointer-events: none; /* Allow clicking through */
+              background: radial-gradient(
+                  circle at var(--mouse-x) var(--mouse-y),
+                  rgba(0, 198, 255, 0.06) 0%, /* Subtle cyan glow */
+                  transparent 20% /* Adjust size of glow */
+              );
+              z-index: 999; /* Ensure it's above background but below content */
+              transition: background 0.1s ease-out; /* Smooth transition */
+          }
+
+
+          .content-wrapper {
+              max-width: var(--container-max-width);
+              margin: 0 auto;
+              padding: 0 20px;
+              opacity: 0;
+              transform: translateY(20px);
+              transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+              position: relative; /* Ensure content is above the body::after glow */
+              z-index: 1;
+          }
+          .content-wrapper.startup {
+               opacity: 1;
+               transform: translateY(0);
+          }
+
+          section {
+              padding: var(--section-padding);
+              opacity: 0;
+              transform: translateY(40px);
+              transition: opacity 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+              will-change: opacity, transform;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          }
+           section:last-of-type {
+               border-bottom: none;
+           }
+          section.visible {
+              opacity: 1;
+              transform: translateY(0);
+          }
+
+          h1, h2, h3, h4 {
+              color: var(--text-heading-color);
+              margin: 0 0 15px 0;
+              font-weight: 600;
+              letter-spacing: 0.3px;
+          }
+           h1 {
+               font-size: clamp(2.5em, 5vw, 3.5em);
+               font-weight: 700;
+               background: linear-gradient(90deg, var(--text-heading-color), var(--primary-accent));
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               margin-bottom: 10px;
+           }
+           h2 {
+               font-size: clamp(1.1em, 2.5vw, 1.4em);
+               color: var(--text-muted-color);
+               font-weight: 400;
+               margin-bottom: 40px;
+               letter-spacing: 0.5px;
+               max-width: 600px;
+               margin-left: auto;
+               margin-right: auto;
+           }
+          h3 {
+              font-size: clamp(1.8em, 4vw, 2.5em);
+              margin-bottom: 40px;
+              position: relative;
+              display: inline-block;
+          }
+          h3::after {
+              content: '';
+              position: absolute;
+              bottom: -8px; left: 0;
+              width: 50px; height: 3px;
+              background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+              border-radius: 2px;
+          }
+
+          p {
+              color: var(--text-color);
+              line-height: 1.7;
+              margin-bottom: 20px;
+              max-width: 750px;
+          }
+           p strong {
+               color: var(--text-heading-color);
+               font-weight: 500;
+           }
+
+          a {
+              color: var(--primary-accent);
+              text-decoration: none;
+              font-weight: 500;
+              transition: color 0.3s ease;
+          }
+          a:hover {
+              color: var(--secondary-accent);
+          }
+
+          .portfolio-header {
+              text-align: center;
+              padding: 60px 0;
+              min-height: 50vh;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              border-bottom: none;
+          }
+
+          .projects-container {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+              gap: 35px;
+              margin-top: 30px;
+          }
+          .project-card {
+              background-color: var(--card-bg);
+              padding: 30px;
+              border-radius: 10px;
+              border: 1px solid var(--card-border);
+              cursor: pointer;
+              position: relative;
+              overflow: hidden;
+              transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+              will-change: transform, border-color;
+          }
+          .project-card:hover {
+              transform: translateY(-6px);
+              border-color: var(--card-hover-border);
+              background-color: var(--card-hover-bg);
+          }
+          .project-card h4 {
+              color: var(--text-heading-color);
+              margin-bottom: 12px;
+              font-size: 1.3em;
+              font-weight: 600;
+          }
+          .project-card p {
+              font-size: 0.98em;
+              color: var(--text-muted-color);
+              line-height: 1.6;
+              margin-bottom: 15px;
+          }
+
+          .code-snippet {
+              background: var(--code-bg);
+              color: var(--code-text);
+              border-radius: 8px;
+              padding: 15px 20px;
+              margin-top: 20px;
+              font-family: var(--font-code);
+              font-size: 0.9em;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              line-height: 1.6;
+              white-space: pre;
+              overflow-x: auto;
+              scrollbar-width: thin;
+              scrollbar-color: var(--code-scrollbar-thumb) var(--code-scrollbar-track);
+          }
+          .code-snippet::-webkit-scrollbar {
+              height: 8px;
+              background-color: var(--code-scrollbar-track);
+              border-radius: 6px;
+          }
+          .code-snippet::-webkit-scrollbar-thumb {
+              background-color: var(--code-scrollbar-thumb);
+              border-radius: 6px;
+              border: 2px solid var(--code-scrollbar-track);
+          }
+          .code-snippet::-webkit-scrollbar-thumb:hover {
+              background-color: var(--code-scrollbar-thumb-hover);
+          }
+
+           /* Syntax highlighting classes (kept for user's snippets) */
+           .code-snippet .keyword { color: var(--keyword-color); }
+           .code-snippet .string { color: var(--string-color); }
+           .code-snippet .function { color: var(--function-color); }
+           .code-snippet .comment { color: var(--comment-color); font-style: italic; }
+
+          .project-details {
+              max-height: 0;
+              overflow: hidden;
+              opacity: 0;
+              transition: max-height 0.4s ease-out, opacity 0.4s ease-out, margin-top 0.4s ease-out, padding-top 0.4s ease-out;
+              font-size: 0.95em;
+              margin-top: 0;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+              padding-top: 0;
+          }
+          .project-card.expanded .project-details {
+              max-height: 450px;
+              opacity: 1;
+              margin-top: 20px;
+              padding-top: 20px;
+          }
+          .project-details p {
+               margin-bottom: 10px;
+               color: var(--text-color);
+          }
+           .project-details strong {
+               color: var(--primary-accent);
+           }
+           .project-details a {
+               font-weight: 600;
+           }
+
+          .contact-section {
+              text-align: center;
+          }
+          .contact-section p {
+              margin-left: auto;
+              margin-right: auto;
+          }
+          .icons-container {
+              display: flex;
+              justify-content: center;
+              gap: 35px;
+              margin-top: 30px;
+              flex-wrap: wrap;
+          }
+          .social-icon-link {
+              display: inline-block;
+              transition: transform 0.2s ease-out;
+          }
+          .social-icon-link:hover {
+              transform: scale(1.1);
+          }
+          .social-icon {
+              width: 32px;
+              height: 32px;
+              filter: grayscale(70%) opacity(0.7);
+              transition: filter 0.3s ease, transform 0.3s ease;
+          }
+          .social-icon-link:hover .social-icon {
+              filter: grayscale(0%) opacity(1);
+          }
+
+          #splash-screen {
+              position: fixed;
+              top: 0; left: 0;
+              width: 100vw; height: 100vh;
+              background: var(--background-color);
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999;
+              opacity: 1;
+              transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+          }
+          #splash-screen.splash-out {
+              opacity: 0;
+              transform: scale(0.95);
+              pointer-events: none;
+          }
+          #splash-text {
+              font-family: var(--font-code);
+              font-size: clamp(2em, 6vw, 4em);
+              color: var(--primary-accent);
+              font-weight: 500;
+              text-shadow: 0 0 10px rgba(0, 198, 255, 0.5);
+              letter-spacing: 0.1em;
+              white-space: nowrap;
+          }
+
+          @media (max-width: 768px) {
+              :root { --section-padding: 60px 0; }
+              body { font-size: 15px; }
+              h1 { font-size: clamp(2em, 8vw, 2.8em); }
+              h2 { font-size: clamp(1em, 4vw, 1.2em); }
+              h3 { font-size: clamp(1.5em, 6vw, 2em); margin-bottom: 30px;}
+              .projects-container { grid-template-columns: 1fr; gap: 25px; }
+               .code-snippet { font-size: 0.85em; }
+          }
+          @media (max-width: 480px) {
+              :root { --section-padding: 50px 0; }
+              body { font-size: 14px; }
+              .content-wrapper { padding: 0 15px; }
+              h1 { font-size: clamp(1.8em, 10vw, 2.4em); }
+              h2 { font-size: clamp(0.9em, 5vw, 1.1em); margin-bottom: 30px;}
+              h3 { font-size: clamp(1.3em, 7vw, 1.8em); }
+              .project-card { padding: 25px; }
+              .icons-container { gap: 25px; }
+              .social-icon { width: 28px; height: 28px; }
+              #splash-text { letter-spacing: 0.05em; }
+               .code-snippet { font-size: 0.8em; }
+          }
+      `;
+      document.head.appendChild(style);
+
+      requestAnimationFrame(() => {
+           document.body.style.opacity = '1';
+      });
   }
 
   private showSplashScreen(): void {
-    const splash = document.createElement('div');
-    splash.id = 'splash-screen';
+      const splash = document.createElement('div');
+      splash.id = 'splash-screen';
 
-    const pseudoContainer = document.createElement('div');
-    const pseudo = document.createElement('span');
-    pseudoContainer.appendChild(pseudo);
-    splash.appendChild(pseudoContainer);
-    document.body.appendChild(splash);
+      const pseudo = document.createElement('span');
+      pseudo.id = 'splash-text';
+      splash.appendChild(pseudo);
+      document.body.appendChild(splash);
 
-    const finalText = '0xZKnw';
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/';
-    let iteration = 0;
-    const totalIterations = 40;
-    
-    // Add the scramble animation styles
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes textGlow {
-        0% { text-shadow: 0 0 8px rgba(226, 230, 234, 0.7); }
-        50% { text-shadow: 0 0 16px rgba(226, 230, 234, 0.9); }
-        100% { text-shadow: 0 0 8px rgba(226, 230, 234, 0.7); }
-      }
-      
-      #splash-screen span {
-        font-family: monospace;
-        animation: textGlow 2s infinite;
-        letter-spacing: 0.2em;
-        font-weight: bold;
-      }
-    `;
-    document.head.appendChild(style);
+      const finalText = '0xZKnw';
+      const chars = '!<>-_\\/[]{}—=+*^?#________';
+      let iteration = 0;
+      const totalIterations = finalText.length * 6;
+      let interval: number | null = null;
 
-    // Scramble animation function
-    const scrambleText = () => {
-      // Determine how many characters should be finalized
-      const finalizedCount = Math.floor((iteration / totalIterations) * finalText.length);
-      
-      let result = '';
-      
-      // Add finalized characters (they won't change anymore)
-      for (let i = 0; i < finalizedCount; i++) {
-        result += finalText[i];
-      }
-      
-      // Add scrambled characters for the rest
-      for (let i = finalizedCount; i < finalText.length; i++) {
-        result += chars[Math.floor(Math.random() * chars.length)];
-      }
-      
-      // Update the text
-      pseudo.textContent = result;
-      
-      // Slow down the animation over time
-      const delay = Math.pow(iteration / totalIterations, 2) * 100 + 30;
-      
-      iteration++;
-      
-      // Continue scrambling if not done
-      if (iteration <= totalIterations) {
-        setTimeout(scrambleText, delay);
-      } else {
-        // When scramble is done, wait a bit before fading out
-        setTimeout(() => {
-          splash.classList.add('splash-out');
-          splash.addEventListener('animationend', () => splash.remove());
-        }, 1000);
-      }
-    };
+      const scrambleText = () => {
+          pseudo.textContent = finalText
+              .split('')
+              .map((_letter, index) => {
+                  if (index < iteration / 6) {
+                      return finalText[index];
+                  }
+                  return chars[Math.floor(Math.random() * chars.length)];
+              })
+              .join('');
 
-    // Start the scramble animation
-    setTimeout(scrambleText, 500);
+          iteration++;
+
+          if (iteration > totalIterations) {
+              if (interval) clearInterval(interval);
+              pseudo.textContent = finalText;
+
+              setTimeout(() => {
+                  splash.classList.add('splash-out');
+                  splash.addEventListener('transitionend', () => {
+                       splash.remove();
+                       this.initPortfolio();
+                  }, { once: true });
+              }, 400);
+          }
+      };
+
+      let lastTime = 0;
+      const frameDuration = 40;
+
+      const animate = (currentTime: number) => {
+           if(!lastTime) lastTime = currentTime;
+           const elapsed = currentTime - lastTime;
+
+          if (elapsed >= frameDuration) {
+               scrambleText();
+               lastTime = currentTime - (elapsed % frameDuration);
+          }
+           if (iteration <= totalIterations) {
+               requestAnimationFrame(animate);
+           }
+      }
+      requestAnimationFrame(animate);
   }
 
-  private createContainer(): void {
-    this.container = document.createElement('div');
-    this.container.classList.add('ide-container');
-
-    // Create the macOS title bar
-    const ideHeader = document.createElement('div');
-    ideHeader.classList.add('ide-header');
-    
-    // Add traffic light buttons (close, minimize, maximize)
-    const trafficLights = document.createElement('div');
-    trafficLights.classList.add('traffic-lights');
-    
-    const closeBtn = document.createElement('div');
-    closeBtn.classList.add('traffic-light', 'close');
-    
-    const minimizeBtn = document.createElement('div');
-    minimizeBtn.classList.add('traffic-light', 'minimize');
-    
-    const maximizeBtn = document.createElement('div');
-    maximizeBtn.classList.add('traffic-light', 'maximize');
-    
-    trafficLights.append(closeBtn, minimizeBtn, maximizeBtn);
-    
-    // Add empty title bar (no text)
-    const titleBar = document.createElement('div');
-    titleBar.classList.add('title-bar');
-    // No text content set
-    
-    ideHeader.append(trafficLights, titleBar);
-    this.container.appendChild(ideHeader);
-    
-    // Create a content area div to hold all the other content
-    const contentArea = document.createElement('div');
-    contentArea.classList.add('content-area');
-    this.container.appendChild(contentArea);
-    
-    // Store the content area for later use
-    this.contentArea = contentArea;
-
-    // Modified hover effect to avoid pushing content out of view
-    this.container.addEventListener('mouseenter', () => {
-      this.container.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
-      this.container.style.borderColor = 'var(--container-hover-border)';
-    });
-    this.container.addEventListener('mouseleave', () => {
-      this.container.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-      this.container.style.borderColor = 'var(--container-border)';
-    });
+  private createContentWrapper(): void {
+      this.contentWrapper = document.createElement('div');
+      this.contentWrapper.classList.add('content-wrapper');
   }
 
-  private addHeader(): void {
-    const header = document.createElement('header');
-    header.classList.add('scroll-element');
+   private addHeaderContent(): void {
+       const headerSection = document.createElement('section');
+       headerSection.classList.add('portfolio-header', 'scroll-element');
+       headerSection.style.borderBottom = 'none';
 
-    const title = document.createElement('h1');
-    title.textContent = '0xZKnw';
+       const title = document.createElement('h1');
+       title.textContent = '0xZKnw';
 
-    const subtitle = document.createElement('h2');
-    subtitle.textContent = 'Developper | Blockchain Enthusiast';
+       const subtitle = document.createElement('h2');
+       subtitle.textContent = 'Developer | Blockchain Enthusiast | Crypto Explorer';
 
-    header.append(title, subtitle);
-    this.contentArea.appendChild(header);
-  }
+       headerSection.append(title, subtitle);
+       this.contentWrapper.appendChild(headerSection);
+   }
 
   private addAboutSection(): void {
-    const aboutSection = document.createElement('section');
-    aboutSection.classList.add('scroll-element');
-    aboutSection.style.textAlign = 'left';
+      const aboutSection = document.createElement('section');
+      aboutSection.id = 'about';
+      aboutSection.classList.add('scroll-element');
 
-    const heading = document.createElement('h3');
-    heading.textContent = 'About me:';
+      const heading = document.createElement('h3');
+      heading.textContent = `About Me`;
 
-    const paragraph = document.createElement('p');
-    paragraph.textContent = "Computer science student passionate about blockchain, cryptography and developpement. I have experience in Python, Java, C, Go, TypeScript, HTML, and CSS.";
+      const paragraph = document.createElement('p');
+      paragraph.textContent = "Passionate computer science student diving deep into the world of blockchain, cryptography, and decentralized systems. Always learning and building with technologies like Python, Go, and exploring the frontiers of Web3.";
 
-    aboutSection.append(heading, paragraph);
-    this.contentArea.appendChild(aboutSection);
+      const skillsParagraph = document.createElement('p');
+      skillsParagraph.innerHTML = `<strong>Skills:</strong> Python, Go, Java, C, TypeScript (Learning), Solidity (Learning), Rust (Learning), HTML/CSS.`;
+
+      aboutSection.append(heading, paragraph, skillsParagraph);
+      this.contentWrapper.appendChild(aboutSection);
   }
 
   private addProjectsSection(): void {
-    const projectsSection = document.createElement('section');
-    projectsSection.classList.add('scroll-element');
-    projectsSection.style.textAlign = 'left';
+      const projectsSection = document.createElement('section');
+      projectsSection.id = 'projects';
+      projectsSection.classList.add('scroll-element');
 
-    const heading = document.createElement('h3');
-    heading.textContent = 'My Projects:';
+      const heading = document.createElement('h3');
+      heading.textContent = `Projects`;
 
-    const projectsContainer = document.createElement('div');
-    projectsContainer.classList.add('projects-container');
+      const projectsContainer = document.createElement('div');
+      projectsContainer.classList.add('projects-container');
 
-    const createCard = (
-      titleText: string,
-      descText: string,
-      codeHTML: string,
-      detailsHTML: string
-    ): HTMLDivElement => {
-      const card = document.createElement('div');
-      card.classList.add('project-card');
+      const createCard = (
+          titleText: string,
+          descText: string,
+          codeHTML: string,
+          detailsHTML: string
+      ): HTMLDivElement => {
+          const card = document.createElement('div');
+          card.classList.add('project-card');
 
-      const title = document.createElement('h4');
-      title.textContent = titleText;
+          const title = document.createElement('h4');
+          title.textContent = titleText;
 
-      const desc = document.createElement('p');
-      desc.textContent = descText;
+          const desc = document.createElement('p');
+          desc.textContent = descText;
 
-      const codeSnippet = document.createElement('pre');
-      codeSnippet.classList.add('code-snippet');
-      codeSnippet.innerHTML = codeHTML;
+          const codeSnippet = document.createElement('pre');
+          codeSnippet.classList.add('code-snippet');
+          codeSnippet.innerHTML = codeHTML;
 
-      const details = document.createElement('div');
-      details.classList.add('project-details');
-      details.innerHTML = detailsHTML;
+          const details = document.createElement('div');
+          details.classList.add('project-details');
+          details.innerHTML = detailsHTML;
 
-      card.append(title, desc, codeSnippet, details);
-      card.addEventListener('click', () => card.classList.toggle('expanded'));
+          card.append(title, desc, codeSnippet, details);
 
-      return card;
-    };
+          card.addEventListener('click', (e) => {
+               if (e.target instanceof HTMLElement && e.target.closest('a')) {
+                   return;
+               }
+               card.classList.toggle('expanded');
+          });
 
-    const Nexa = createCard(
-      'Nexa',
-      'Decentralized messaging service with sockets.',
-      `<span class='keyword'>from</span> <span class='function'>Nexa</span> <span class='keyword'>import</span> <span class='function'>initService</span>
-messaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>)`,
-      "Developed with a team of four in Python. GitHub: <a href='https://github.com/val-005/Nexa'>Nexa</a>"
-    );
+          return card;
+      };
 
-    const anovlt = createCard(
-      'AnoVlt',
-      'Encrypt your files asymmetrically.',
-      `<span class='keyword'>import</span> <span class='string'>'eciesgo'</span>
-<span class='keyword'>func</span> <span class='function'>anovlt</span>(pub <span class='keyword'>string</span>) *<span class='function'>eciesgo</span>.secrets {
-    <span class='keyword'>return</span> eciesgo.<span class='function'>Encrypt</span>(pub, <span class='string'>'secrets.zip'</span>)
-}`,
-      "Developed solo in Python. GitHub: <a href='https://github.com/0xZKnw/Bc_Test'>Bc_Test</a>"
-    );
+       const Nexa = createCard(
+           'Nexa',
+           'Decentralized messaging service with websockets.',
+           `<span class='keyword'>from</span> <span class='function'>Nexa</span> <span class='keyword'>import</span> <span class='function'>initService</span>\nmessaging = <span class='function'>initService</span>(<span class='string'>'Nexa'</span>)`,
+           "<p>Collaborative project focused on secure, decentralized communication.</p><p><strong>Tech:</strong> Python, Websockets </p><p><a href='https://github.com/val-005/Nexa' target='_blank' rel='noopener noreferrer'>View on GitHub &rarr;</a></p>"
+       );
+       const anovlt = createCard(
+           'AnoVlt',
+           'Encrypt your files asymmetrically.',
+           `<span class='keyword'>import</span> <span class='string'>'eciesgo'</span>\n<span class='keyword'>func</span> <span class='function'>anovlt</span>(pub <span class='keyword'>string</span>) *<span class='function'>eciesgo</span>.secrets {\n    <span class='keyword'>return</span> eciesgo.<span class='function'>Encrypt</span>(pub, <span class='string'>'secrets.zip'</span>)\n}`,
+           "<p>Experimentation with ECIES for secure file handling.</p><p><strong>Tech:</strong> Go, ECIES Library</p><p><a href='https://github.com/0xZKnw/Bc_Test' target='_blank' rel='noopener noreferrer'>Related Exploration &rarr;</a></p>"
+       );
+       const ZKnwMe = createCard(
+           '0xZKnw.me',
+           'This Website.',
+           `<span class='keyword'>import</span> axios;\naxios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
+           "<p>The website you're currently viewing ! Built using TypeScript.</p><p><strong>Tech:</strong> TypeScript, HTML, CSS</p><p><a href='https://github.com/0xZKnw/0xzknw.me' target='_blank' rel='noopener noreferrer'>View Source &rarr;</a></p>"
+       );
+       const PwdMng = createCard(
+           'PwdMng',
+           'A password manager with ecies encryption.',
+           `<span class='keyword'>import</span> cryptography\n<span class='keyword'>def</span> <span class='function'>encrypt_password</span>(password):\n    <span class='keyword'>return</span> cryptography.<span class='function'>encrypt</span>(password)`,
+           "<p>A secure password manager using asymetric encryption (ECIES).</p><p><strong>Tech:</strong> Python, ECIES Libraries </p><p><a href='https://github.com/0xZKnw/PwdMng' target='_blank' rel='noopener noreferrer'>View on GitHub &rarr;</a></p>"
+       );
 
-    const ZKnwMe = createCard(
-      '0xZKnw.me',
-      'This Website.',
-      `<span class='keyword'>import</span> axios;
-axios.<span class='function'>get</span>(<span class='string'>'https://0xZKnw.me'</span>);`,
-      "Developed solo in TypeScript. GitHub: <a href='https://github.com/0xZKnw/0xzknw.me'>0xZKnw.me</a>"
-    );
-
-    const PwdMng = createCard(
-      'PwdMng',
-      'A password manager with ecies encryption.',
-      `<span class='keyword'>import</span> cryptography
-<span class='keyword'>def</span> <span class='function'>encrypt_password</span>(password):
-    <span class='keyword'>return</span> cryptography.<span class='function'>encrypt</span>(password)`,
-      'Developed solo in Python. GitHub: <a href="https://github.com/0xZKnw/PwdMng">PwdMng</a>'
-    );
-
-    projectsContainer.append(Nexa, PwdMng, ZKnwMe, anovlt);
-    projectsSection.append(heading, projectsContainer);
-    this.contentArea.appendChild(projectsSection);
+      projectsContainer.append(Nexa, PwdMng, ZKnwMe, anovlt);
+      projectsSection.append(heading, projectsContainer);
+      this.contentWrapper.appendChild(projectsSection);
   }
 
   private addContactSection(): void {
-    const contactSection = document.createElement('section');
-    contactSection.classList.add('scroll-element');
-    contactSection.style.textAlign = 'center';
+      const contactSection = document.createElement('section');
+      contactSection.id = 'contact';
+      contactSection.classList.add('contact-section', 'scroll-element');
 
-    const heading = document.createElement('h3');
-    heading.textContent = 'Contact';
+      const heading = document.createElement('h3');
+      heading.textContent = `Get In Touch`;
 
-    const iconsContainer = document.createElement('div');
-    iconsContainer.style.display = 'flex';
-    iconsContainer.style.justifyContent = 'center';
-    iconsContainer.style.gap = '20px';
-    iconsContainer.style.marginTop = '10px';
+      const paragraph = document.createElement('p');
+       paragraph.textContent = "Interested in collaborating or discussing tech, blockchain, and crypto? Feel free to reach out.";
+       paragraph.style.maxWidth = '600px';
+       paragraph.style.margin = '0 auto 30px auto';
 
-    const createIconLink = (href: string, imgSrc: string, altText: string): HTMLAnchorElement => {
-      const link = document.createElement('a');
-      link.href = href;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      const iconsContainer = document.createElement('div');
+      iconsContainer.classList.add('icons-container');
 
-      const img = document.createElement('img');
-      img.src = imgSrc;
-      img.alt = altText;
-      img.style.width = '32px';
-      img.style.height = '32px';
-      img.classList.add('social-icon');
+      const createIconLink = (href: string, imgSrc: string, altText: string): HTMLAnchorElement => {
+          const link = document.createElement('a');
+          link.href = href;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.classList.add('social-icon-link');
+          link.setAttribute('aria-label', altText);
 
-      link.appendChild(img);
-      return link;
-    };
+          const img = document.createElement('img');
+          img.src = imgSrc;
+          img.alt = altText;
+          img.classList.add('social-icon');
+           img.onerror = () => {
+               img.style.display = 'none';
+               const fallbackText = document.createElement('span');
+               fallbackText.textContent = altText;
+               fallbackText.style.color = 'var(--text-muted-color)';
+               fallbackText.style.fontSize = '0.8em';
+               link.appendChild(fallbackText);
+           };
 
-    const discordIcon = createIconLink('https://discord.com/users/0xZKnw', './img/discord.svg', 'Discord');
-    const githubIcon = createIconLink('https://github.com/0xZKnw', './img/github.svg', 'GitHub');
-    const twitterIcon = createIconLink('https://twitter.com/0xZKnw', './img/x.svg', 'Twitter');
-    const linkedinIcon = createIconLink('https://www.linkedin.com/in/justin-olivier-1a6b0a31a/', './img/linkedin.svg', 'LinkedIn');
+          link.appendChild(img);
+          return link;
+      };
 
-    iconsContainer.append(discordIcon, githubIcon, twitterIcon, linkedinIcon);
-    contactSection.append(heading, iconsContainer);
-    this.contentArea.appendChild(contactSection);
+      const discordIcon = createIconLink('https://discord.com/users/0xZKnw', './img/discord.svg', 'Discord');
+      const githubIcon = createIconLink('https://github.com/0xZKnw', './img/github.svg', 'GitHub');
+      const twitterIcon = createIconLink('https://twitter.com/0xZKnw', './img/x.svg', 'Twitter');
+      const linkedinIcon = createIconLink('https://www.linkedin.com/in/justin-olivier-1a6b0a31a/', './img/linkedin.svg', 'LinkedIn');
+
+      iconsContainer.append(discordIcon, githubIcon, twitterIcon, linkedinIcon);
+      contactSection.append(heading, paragraph, iconsContainer);
+      this.contentWrapper.appendChild(contactSection);
   }
 
   private initScrollAnimations(): void {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-appear');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.2 });
+      if (this.observer) {
+          this.observer.disconnect();
+      }
 
-    document.querySelectorAll('.scroll-element').forEach(element => {
-      observer.observe(element);
-    });
+      this.observer = new IntersectionObserver(
+          (entries, observerInstance) => {
+              entries.forEach(entry => {
+                  const delay = (entry.target.getAttribute('data-scroll-delay') || 0) + 'ms';
+                  if (entry.isIntersecting) {
+                      entry.target.classList.add('visible');
+                      (entry.target as HTMLElement).style.transitionDelay = delay;
+                      observerInstance.unobserve(entry.target);
+                  }
+              });
+          },
+          {
+              root: null,
+              threshold: 0.1,
+              rootMargin: "0px 0px -5% 0px"
+          }
+      );
+
+      this.contentWrapper.querySelectorAll('.scroll-element').forEach((element, index) => {
+          this.observer?.observe(element);
+      });
   }
+
+   private initInteractiveElements(): void {
+       document.body.addEventListener('mousemove', (e) => {
+           const x = e.clientX / window.innerWidth;
+           const y = e.clientY / window.innerHeight;
+           document.body.style.setProperty('--mouse-x', `${x * 100}%`);
+           document.body.style.setProperty('--mouse-y', `${y * 100}%`);
+       });
+   }
 }
 
-new Portfolio();
+document.addEventListener('DOMContentLoaded', () => {
+  new Portfolio();
+});
